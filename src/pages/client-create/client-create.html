@@ -1,0 +1,30 @@
+<ion-header>
+    <ion-navbar>
+        <ion-title>Client Create</ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-list>
+        <ion-item>
+            <ion-label color="primary" fixed>Name</ion-label>
+            <ion-input type="text" [(ngModel)]="form.name"></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label color="primary">Gender</ion-label>
+            <ion-select [(ngModel)]="form.gender">
+                <ion-option value="m">Male</ion-option>
+                <ion-option value="f">Female</ion-option>
+            </ion-select>
+        </ion-item>
+
+        <ion-item>
+            <ion-label color="primary" fixed>CPF</ion-label>
+            <ion-input type="text" [(ngModel)]="form.cpf"></ion-input>
+        </ion-item>
+    </ion-list>
+
+    <button ion-button (click)="create()">Create</button>
+    <button ion-button outline navPop>Cancel</button>
+</ion-content>

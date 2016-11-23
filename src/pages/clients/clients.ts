@@ -1,22 +1,97 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import {
+    NavController,
+    LoadingController,
+    ModalController,
+    AlertController,
+} from 'ionic-angular';
 
-/*
-  Generated class for the Clients page.
+// services
+import { ClientService } from '../../providers/client-service';
 
-  See http://ionicframework.com/docs/v2/components/#navigation for more info on
-  Ionic pages and navigation.
-*/
+// pages
+import { ClientCreatePage } from '../client-create/client-create'
+
 @Component({
-  selector: 'page-clients',
-  templateUrl: 'clients.html'
+    selector: 'page-clients',
+    templateUrl: 'clients.html',
+    providers: [
+        ClientService,
+    ],
 })
+
 export class ClientsPage {
+    loader: any;
+    clients = [];
 
-  constructor(public navCtrl: NavController) {}
+    createPage = ClientCreatePage;
 
-  ionViewDidLoad() {
-    console.log('Hello ClientsPage Page');
-  }
+    constructor(
+        public nav: NavController,
+        private loading: LoadingController,
+        private modal: ModalController,
+        private alert: AlertController,
+        public clientService: ClientService,
+    ) {
+        this.load();
+    }
 
+    load(reload = false) {
+        if (this.clients.length && !reload) return;
+
+        this.createLoader();
+
+        this.clientService.load(reload)
+            .then(data => {
+                this.clients = data;
+                this.loader.dismiss();
+
+                console.log(this.clients);
+            });
+    }
+
+    createLoader() {
+        this.loader = this.loading.create({
+            content: 'Loading...',
+        });
+
+        this.loader.present();
+    }
+
+    clientCreateModal() {
+        let clientCreateModal = this.modal.create(ClientCreatePage);
+
+        clientCreateModal.onDidDismiss(data => {
+            this.load(data.reload);
+        });
+
+        clientCreateModal.present();
+    }
+
+    destroyClient(id) {
+        let confirm = this.alert.create({
+            title: 'Destroy',
+            message: 'Do you agree to destroy this user?',
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel',
+                },
+                {
+                    text: 'Destroy',
+                    handler: () => {
+                        this.createLoader();
+
+                        this.clientService.destroy(id)
+                            .then(data => {
+                                this.loader.dismiss();
+                                this.load(true);
+                            });
+                    }
+                }
+            ]
+        });
+
+        confirm.present();
+    }
 }
